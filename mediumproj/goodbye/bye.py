@@ -1,4 +1,16 @@
+#!/usr/bin/env python
 
+""" Short description.
+
+Lllloooooonnnnnngggggggg    d e s c r i p t i o n.
+	
+""" 
+
+# Standard library
+
+# 3rd Party Library
+
+# Local imports
 from mediumproj.settings import CONFIGURE
 
 
