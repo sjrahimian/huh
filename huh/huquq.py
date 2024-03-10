@@ -27,7 +27,7 @@ class HuquqMissingValueError(HuquqError, Exception):
 
 """
 
-class Huquq():
+class Huququllah():
     _PERCENT = 0.19
     name_full = "huquq'u'llah"
     name_full_diacritic = "ḥuqúqu'lláh"
