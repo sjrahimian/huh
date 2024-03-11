@@ -28,45 +28,56 @@ class HuquqMissingValueError(HuquqError, Exception):
 """
 
 class Huququllah():
-    _PERCENT = 0.19
-    name_full = "huquq'u'llah"
-    name_full_diacritic = "ḥuqúqu'lláh"
-    name_full_diacritic_capital = "Ḥuqúqu'lláh"
-    name_short = "Hq"
+    name = "huquq'u'llah"
+    diacritic = "ḥuqúqu'lláh"
+    diacritic_capital = "Ḥuqúqu'lláh"
+    short = "Hq"
     symbol = "Ͱ"
-    labels = { "name": name_full, "symbol": symbol, "short": short, "diacritic": name_full_diacritic }
      
-    def __init__(self, metalPrice: float, weight: str="oz", unit: str="short"):
+    def __init__(self, metalPrice: float=0.00, weight: str="oz", unit: str="short"):
+        self._PERCENT = 0.19
+        self._labels = { "name": self.name, "symbol": self.symbol, "short": self.short, "diacritic": self.diacritic }
         self._mPrice = metalPrice
         self._weight = weight.lower()
-        self._unit = self.labels[unit.lower()]
+        self._unit = self._labels[unit.lower()]
+        self._basic = None
         self._calculate_basic_sum()
     
     @property
     def basic(self) -> float:
-        return self._amount
+        return self._basic
     
-    @huh.setter
+    @basic.setter
     def basic(self, val: float):
-        self._amount = val 
+        self._basic = val 
 
     @property
     def remainder(self) -> float:
         return self._remainder
     
-    @huh.setter
+    @remainder.setter
     def remainder(self, val: float):
         self._remainder = val
 
     @property
     def unit(self) -> str:
+        """ Selected label """
         return self._unit
+    
+    @property
+    def labels(self):
+        return self._labels
+
+    @labels.setter
+    def labels(self, value: dict):
+        self._labels = value | self._labels
 
     def _calculate_basic_sum(self) -> None:
         """ '...basic sum on which Huqúqu'lláh is payable is nineteen mithqáls of gold.' 
                 - BH, #35, Huqúqu'lláh: The Right of God (2007)
         
-            Multipling the cost of gold/gram to 69.192g will calculate 19 mithqāls of gold in dollars, i.e., the basic sum (one Ḥuqúqu'lláh unit).
+            Multiplying the cost of gold/gram to 69.192g will calculate 19 mithqāls of 
+                gold in dollars, i.e., the basic sum (one Ḥuqúqu'lláh unit).
         
             Conversion:
                 19Nk =  1Mq =  3.642g
@@ -77,7 +88,7 @@ class Huququllah():
                         or
                 X = gold $ per g * 3.642g * 19
 
-            :return None: montary equivalant to 19 mithqāls of gold (basic sum)
+            :return None: monetary equivalent to 19 mithqāls of gold (basic sum)
         """
         GRAMS = 69.192
         MITHQAL = 19
@@ -90,7 +101,7 @@ class Huququllah():
         elif self._weight in ("mithqal", "mithqals", "mq"):
             factor = MITHQAL
 
-        self.basic(self._mPrice * factor)
+        self._basic = self._mPrice * factor
 
 
     def payable(self, wealth: float = None):
@@ -99,11 +110,12 @@ class Huququllah():
             (wealth - remainder) * 19%
         
         :param float: Monetary wealth after expenses have been deducted
-        :return flaot: Payment owing for Ḥuqúqu'lláh
+        
+        :return float: Payment owing for Ḥuqúqu'lláh
         """
 
         if not wealth:
-            raise MissingHuquqWealthValue("Cannot calculate Ḥuqúqu'lláh without accured wealth.")
+            raise MissingHuquqWealthValue(f"Cannot calculate {self.name} without accrued wealth.")
         
         if not self.basic:
             raise HuquqMissingValueError("Provide gold price first to find basic sum amount.")
@@ -116,7 +128,7 @@ class Huququllah():
         # Gives the remainder of wealth that has not reached a full unit (if any)
         self.remainder(wealth % self.basic)
 
-        print(f"Wealth contains {wealth // self.basic} basic units of Ḥuqúqu'lláh.")
+        print(f"Wealth contains {wealth // self.basic} basic units of {self.name}.")
         print(f"       Amount of wealth that will have {self.unit} paid: ${round((pay / self._PERCENT), 2)}.")
         print(f"Remainder of wealth that will not have {self.unit} paid: ${round(self.remainder, 2)}.\n\n")
         
