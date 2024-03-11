@@ -14,6 +14,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 import sys
+from huh.huquq import Huququllah
 
 from huh.__init__ import __title__
 
@@ -60,28 +61,32 @@ class Configuration():
                         raise MissingConfigValue(f"Missing value for: [{section}] > {key}")                        
 
         # Special case 
-        loc = cfg['LOCATION']
+        section = 'LOCATION'
+        loc = cfg[section]
         if (loc['city'] == "" or loc['country'] == "") and (loc['latitude'] == "" or loc['longitude'] == ""):
-            raise MissingConfigValue(f'Missing value for: [LOCATION].\nAdd either address or latitude/longitude.')                        
+            raise MissingConfigValue(f'Missing value for: [{section}].\nAdd either address or latitude/longitude.')                        
         
         # Check values
-        val = cfg['HUQUQ']['metal']
+        section = 'HUQUQ'
+        val = cfg[section]['metal']
         if val not in ('silver', 'gold'):
-            raise IncorrectConfigValue(f'[HUQUQ] > metal value is invalid: "{val}"')
+            raise IncorrectConfigValue(f'[{section}] > metal value is invalid: "{val}"')
 
-        val = cfg['HUQUQ']['unit']
-        if val not in ('name', 'diacritic', 'short', 'symbol'):
-            raise IncorrectConfigValue(f'[HUQUQ] > unit value is invalid: "{val}"')
-        
-        val = cfg['DATETIME']['time']
+        if "custom units" not in cfg[section]:
+            val = cfg[section]['unit']
+            if val not in Huququllah().labels.keys():
+                raise IncorrectConfigValue(f'[{section}] > unit value is invalid: "{val}"')
+
+        section = 'DATETIME'
+        val = cfg[section]['time']
         if val not in ('dawn', 'sunrise', 'noon', 'sunset', 'dusk', 'now'):
             if not re.fullmatch("[0-9][0-9]:[0-9][0-9]", val):
-                raise IncorrectConfigValue(f'[DATETIME] > time value is invalid: "{val}"')
+                raise IncorrectConfigValue(f'[{section}] > time value is invalid: "{val}"')
                 sys.exit(1)
             try:
                 dt.datetime.strptime(val, "%H:%M")
             except ValueError:
-                print(f'[DATETIME] > time value is not a valid time in 24-hour notation: "{val}"')
+                print(f'[{section}] > time value is not a valid time in 24-hour notation: "{val}"')
                 sys.exit(1)
 
 
@@ -106,7 +111,7 @@ def arguments():
 
     parser.add_argument('amount', type=float, help='The amount after expenses to pay HQUH on.')
     parser.add_argument('-u', '--unit', type=float, help='One unit of HQUH (equal to 19 mithqals).')
-    parser.add_argument('-p', '--price', type=float, help='Metal price.')
+    parser.add_argument('-f', '--fetch', type=float, help='Fetch the metal prices.')
     parser.add_argument('-l', '--log', action='store_true', help='Record to file.')
 
     return parser.parse_args()
