@@ -72,23 +72,27 @@ class Configuration():
         if val not in ('silver', 'gold'):
             raise IncorrectConfigValue(f'[{section}] > metal value is invalid: "{val}"')
 
-        if "custom units" not in cfg[section]:
-            val = cfg[section]['unit']
-            if val not in Huququllah().labels.keys():
-                raise IncorrectConfigValue(f'[{section}] > unit value is invalid: "{val}"')
-
-        section = 'DATETIME'
+        section = 'FISCAL'
         val = cfg[section]['time']
         if val not in ('dawn', 'sunrise', 'noon', 'sunset', 'dusk', 'now'):
             if not re.fullmatch("[0-9][0-9]:[0-9][0-9]", val):
                 raise IncorrectConfigValue(f'[{section}] > time value is invalid: "{val}"')
                 sys.exit(1)
             try:
-                dt.datetime.strptime(val, "%H:%M")
+                cfg[section]['time'] = dt.datetime.strptime(val, "%H:%M")
             except ValueError:
-                print(f'[{section}] > time value is not a valid time in 24-hour notation: "{val}"')
+                print(f'[{section}] > time value is not a valid 24-hour format: "{val}"')
                 sys.exit(1)
 
+        val = cfg[section]['date']
+        if not re.fullmatch("[0-1][0-9]-[0-3][0-9]", val):
+            raise IncorrectConfigValue(f'[{section}] > date value is invalid: "{val}"')
+            sys.exit(1)
+        try:
+            cfg[section]['date'] = dt.datetime.strptime(val, "%m-%d")
+        except ValueError:
+            print(f'[{section}] > fiscal date value is not a valid "MM-DD" format: "{val}"')
+            sys.exit(1)
 
     # Logger setup for use throughout application
     def _prepareLogger(self, fn):
