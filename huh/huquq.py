@@ -1,16 +1,11 @@
 # Standard library
+import json
+from pathlib import Path
 import sys
-from typing import List, Tuple
 
 # 3rd Party Library
 
 # Local Imports
-
-class HuquqError(Exception):
-    """ Base exception class for errors from this module. """
-
-class HuquqMissingValueError(HuquqError, Exception):
-    """ Exception class for calculation errors from this module. """
 
 """Symbol Reasoning
 
@@ -27,6 +22,14 @@ class HuquqMissingValueError(HuquqError, Exception):
 
 """
 
+class JSONCommentDecoder(json.JSONDecoder):
+    def __init__(self, **kw):
+        super().__init__(**kw)
+
+    def decode(self, s: str):
+        s = '\n'.join( line if not line.lstrip().startswith('//') else '' for line in s.split('\n') )
+        return super().decode(s)
+
 class Huququllah():
     name = "huquq'u'llah"
     diacritic = "ḥuqúqu'lláh"
@@ -34,22 +37,26 @@ class Huququllah():
     short = "Hq"
     symbol = "Ͱ"
      
-    def __init__(self, metalPrice: float=0.00, weight: str="oz", unit: str="short"):
+    def __init__(self, metalPrice: float=0.00, metalType: str="", weight: str="oz", unit: str="short"):
         self._PERCENT = 0.19
+
+        # load custom labels from json
         self._labels = { "name": self.name, "symbol": self.symbol, "short": self.short, "diacritic": self.diacritic }
+        if (fn:= Path(f"{Path().cwd().parent}\labels.jsonc")).exists():
+            with open(fn, 'r') as f:
+                self._labels = self._labels | json.load(f, cls=JSONCommentDecoder)
+        
         self._mPrice = metalPrice
+        self._mType = metalType
         self._weight = weight.lower()
+        print(self._labels)
         self._unit = self._labels[unit.lower()]
-        self._basic = None
+        self._basic, self._remainder = None, None
         self._calculate_basic_sum()
     
     @property
     def basic(self) -> float:
         return self._basic
-    
-    @basic.setter
-    def basic(self, val: float):
-        self._basic = val 
 
     @property
     def remainder(self) -> float:
@@ -104,7 +111,7 @@ class Huququllah():
         self._basic = self._mPrice * factor
 
 
-    def payable(self, wealth: float = None):
+    def payable(self, wealth: float) -> float:
         """ Compute payable amount of Ḥuqúqu'lláh.
             
             (wealth - remainder) * 19%
@@ -113,28 +120,29 @@ class Huququllah():
         
         :return float: Payment owing for Ḥuqúqu'lláh
         """
+        if self._basic is None:
+            raise ValueError(f"Provide {self._mType} price first to find basic sum amount.")
 
-        if not wealth:
-            raise MissingHuquqWealthValue(f"Cannot calculate {self.name} without accrued wealth.")
+        if wealth < self._basic:
+            return 0.00
         
-        if not self.basic:
-            raise HuquqMissingValueError("Provide gold price first to find basic sum amount.")
-        
-        if wealth < self.basic:
-            pay = 0.00
-        else:
-            pay = (wealth - self.remainder) * self._PERCENT
-
         # Gives the remainder of wealth that has not reached a full unit (if any)
-        self.remainder(wealth % self.basic)
+        try:
+            self._remainder = wealth % self._basic
+            pay = (wealth - self._remainder) * self._PERCENT
+        except ZeroDivisionError:
+            raise ValueError(f"[ERROR] Failed to properly calculate {self._unit} basic amount based on {self._mType}.")
+            sys.exit(-1)
+            # return 0.00
 
-        print(f"Wealth contains {wealth // self.basic} basic units of {self.name}.")
-        print(f"       Amount of wealth that will have {self.unit} paid: ${round((pay / self._PERCENT), 2)}.")
-        print(f"Remainder of wealth that will not have {self.unit} paid: ${round(self.remainder, 2)}.\n\n")
+        print(f"Your accrued wealth contains {wealth // self._basic} {self._unit}.")
+        print(f"       Amount of wealth that {self._unit} will be payable on: ${format(round((wealth - self._remainder), 2), '.2f')}.")
+        print(f"Remainder of wealth that will not have {self._unit} paid: ${round(self._remainder, 2)}.\n\n")
+        print("You owe", pay)
         
         return pay
 
     def __str__(self):
         """ String representation of this object """
-        return f"${round(self.basic, 2)}{self.unit}"
+        return f"${round(self._basic, 2)}{self._unit}"
 
