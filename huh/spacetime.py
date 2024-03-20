@@ -4,7 +4,7 @@
 # Standard library
 import datetime
 import sys
-from typing import List, Tuple, Union
+from typing import List
 
 # 3rd Party Library
 from astral import Observer, sun
@@ -23,11 +23,11 @@ def addressToLatLong(address: str):
 
     try:
         if not re.fullmatch("([a-zA-Z]+) ([a-zA-Z]+) ([a-zA-Z]+)", address):
-            raise ValueError("Incorrect format address string: 'city state country'")
+            raise ValueError("Incorrect format address string: 'city state country'\n Check your configuration file.")
         
         geo = Nominatim(user_agent="mind-your-own-beeswax")
         loc = geo.geocode(address)
-        return [loc.latitude, location.longitude]
+        return [loc.latitude, loc.longitude]
         
     except ValueError as e:
         print(e)
@@ -48,12 +48,13 @@ def getSunPeriodTerms() -> List[str]:
     return [ opt for opt in options ]
 
 
-def getSolarTime(lat: float, lon: float, period: str='sunset', date: datetime=datetime.date.today()) -> datetime:
+def getSolarTime(lat: float, lon: float, address: str, period: str='sunset', date: datetime=datetime.date.today()):
     """Calculates the time during the day when the sun is positioned at the specified period (e.g., noon).
 
     Args:
-        lat (float): _description_
-        lon (float): _description_
+        lat (float): latitude
+        lon (float): longitude
+        address (str): city, state, and country if no latitude/longitude provided
         period (str, optional): The word that specifies a specific period of day. Defaults to 'sunset'.
         date (datetime, optional): The date to check. Defaults to datetime.date.today().
 
@@ -61,33 +62,72 @@ def getSolarTime(lat: float, lon: float, period: str='sunset', date: datetime=da
         datetime: time
     """
 
+    if lat == "" and lon == "":
+        lat, lon = addressToLatLong(address)
+        # print(">> lat, lon >>", lat, lon)
+
+
     tz = TimezoneFinder().timezone_at(lat=lat, lng=lon)
     s = sun.sun(Observer(lat, lon), date=date, tzinfo=tz)
     return s[optKey]
 
 
-def convertToEpoch(from: datetime) -> int:
+def convertToEpoch(value: datetime) -> int:
     """ Takes datetime and converts to epoch timestamp
 
     Args:
-        from (datetime): date and time
+        value (datetime): date and time
 
     Returns:
         int: epoch timestamp
     """
 
-    return int(from.timestamp() * 1e3)
+    return int(value.timestamp() * 1e3)
 
 
-def convertFromEpoch(from: int) -> datetime:
+def convertFromEpoch(value: int):
     """ Converts epoch (in milliseconds) to human-readable date and time.
 
     Args:
-        time (int): epoch timestamp
+        value (int): epoch timestamp or integer equivalent
 
     Returns:
         datetime: date and time
     """
 
-    return datetime.datetime.fromtimestamp((from / 1000.0)).strftime('%Y-%m-%d %H:%M:%S.%f')
+    return datetime.datetime.fromtimestamp((value / 1000.0)).strftime('%Y-%m-%d %H:%M:%S.%f')
 
+def timeRange(target) -> tuple:
+    """Provides a range of 30 minutes before and after the provided target time.
+    Will adjust the range if the end is set to a future time, and move the beginning of the range back by one hour.
+
+    Args:
+        target (datetime): desired time to calculate 
+
+    Returns:
+        tuple: A tuple with two integers representing epoch time in the position of (start, end)
+    """
+    start = target - datetime.timedelta(minutes=30)
+    end = target + datetime.timedelta(minutes=30)
+
+    # Prevent program from becoming psychic.
+    if end.timestamp() > datetime.datetime.now().timestamp():
+        start = target - datetime.timedelta(hours=1)
+        end = datetime.datetime.now()
+    
+    return tuple(convertToEpoch(start), convertToEpoch(end))
+    
+
+def nearestTime(target, data) -> dict:
+    """  Assumes data list is not sorted.
+
+    Args:
+        target (datetime): target time
+        data (list): a list of dictionaries
+
+    Returns:
+        dictionary: closest value to target timestamp
+    """
+
+    target = convertToEpoch(target)
+    return min(data, key=lambda x : abs(x["timestamp"] - target))
