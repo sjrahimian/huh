@@ -31,6 +31,7 @@ class JSONCommentDecoder(json.JSONDecoder):
         return super().decode(s)
 
 class Huququllah():
+    _PERCENT = 0.19
     name = "huquq'u'llah"
     diacritic = "ḥuqúqu'lláh"
     diacritic_capital = "Ḥuqúqu'lláh"
@@ -38,22 +39,24 @@ class Huququllah():
     symbol = "Ͱ"
      
     def __init__(self, metalPrice: float=0.00, metalType: str="", weight: str="oz", unit: str="short"):
-        self._PERCENT = 0.19
 
         # load custom labels from json
         self._labels = { "name": self.name, "symbol": self.symbol, "short": self.short, "diacritic": self.diacritic }
-        if (fn:= Path(f"{Path().cwd().parent}\labels.jsonc")).exists():
+        if (fn:= Path(f"{Path().cwd().parent}/labels.jsonc")).exists():
             with open(fn, 'r') as f:
                 self._labels = self._labels | json.load(f, cls=JSONCommentDecoder)
         
         self._mPrice = metalPrice
         self._mType = metalType
         self._weight = weight.lower()
-        print(self._labels)
         self._unit = self._labels[unit.lower()]
         self._basic, self._remainder = None, None
         self._calculate_basic_sum()
     
+    @property
+    def percent(self) -> float:
+        return self._PERCENT
+
     @property
     def basic(self) -> float:
         return self._basic
@@ -101,12 +104,14 @@ class Huququllah():
         MITHQAL = 19
         TROY_OZ = 2.22457446
 
-        if self._weight in ("troy ounce", "troy ounces", "troy oz", "oz troy", "t oz", "toz", "oz"):
+        if self._weight in ("troy oz", "t oz", "toz"):
             factor = TROY_OZ
         elif self._weight in ("gram", "grams", "g"):
             factor = GRAMS
         elif self._weight in ("mithqal", "mithqals", "mq"):
             factor = MITHQAL
+        else:
+            raise ValueError(f"Incorrect weight provided: {self._weight}")
 
         self._basic = self._mPrice * factor
 
