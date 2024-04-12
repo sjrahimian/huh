@@ -3,6 +3,7 @@
 
 # Standard library
 import datetime
+import re
 import sys
 from typing import List
 
@@ -22,8 +23,9 @@ def addressToLatLong(address: str):
     """
 
     try:
-        if not re.fullmatch("([a-zA-Z]+) ([a-zA-Z]+) ([a-zA-Z]+)", address):
-            raise ValueError("Incorrect format address string: 'city state country'\n Check your configuration file.")
+        if not re.fullmatch("([a-zA-Z.\- ]+) ([a-zA-Z.\- ]+) ([a-zA-Z.\- ]+)", address):
+            raise ValueError("No address provided or incorrect format address string: 'city state country'\n")
+            sys.exit(-1)
         
         geo = Nominatim(user_agent="mind-your-own-beeswax")
         loc = geo.geocode(address)
@@ -48,7 +50,7 @@ def getSunPeriodTerms() -> List[str]:
     return [ opt for opt in options ]
 
 
-def getSolarTime(lat: float, lon: float, address: str, period: str='sunset', date: datetime=datetime.date.today()):
+def getSolarTime(address: str=None, lat: float=32.943608, lon: float=35.091979, period: str='sunset', date: datetime=datetime.date.today()):
     """Calculates the time during the day when the sun is positioned at the specified period (e.g., noon).
 
     Args:
@@ -61,18 +63,20 @@ def getSolarTime(lat: float, lon: float, address: str, period: str='sunset', dat
     Returns:
         datetime: time
     """
-
-    if lat == "" and lon == "":
+    if (lat == "" and lon == ""):
         lat, lon = addressToLatLong(address)
         # print(">> lat, lon >>", lat, lon)
 
+    try:
+        tz = TimezoneFinder().timezone_at(lat=float(lat), lng=float(lon))
+    except TypeError:
+        print("Unable to cast latitude and longitude as float.")
 
-    tz = TimezoneFinder().timezone_at(lat=lat, lng=lon)
     s = sun.sun(Observer(lat, lon), date=date, tzinfo=tz)
-    return s[optKey]
+    return s[period]
 
 
-def convertToEpoch(value: datetime) -> int:
+def datetimeToEpoch(value: datetime) -> int:
     """ Takes datetime and converts to epoch timestamp
 
     Args:
@@ -85,7 +89,7 @@ def convertToEpoch(value: datetime) -> int:
     return int(value.timestamp() * 1e3)
 
 
-def convertFromEpoch(value: int):
+def epochToDatetime(value: int):
     """ Converts epoch (in milliseconds) to human-readable date and time.
 
     Args:
@@ -115,19 +119,21 @@ def timeRange(target) -> tuple:
         start = target - datetime.timedelta(hours=1)
         end = datetime.datetime.now()
     
-    return tuple(convertToEpoch(start), convertToEpoch(end))
+    return (datetimeToEpoch(start), datetimeToEpoch(end))
     
 
-def nearestTime(target, data) -> dict:
-    """  Assumes data list is not sorted.
+def nearestTime(target: (datetime, int), data: list):
+    """ Finds the closest time to a target given a list
 
     Args:
-        target (datetime): target time
-        data (list): a list of dictionaries
+        target (datetime, int): _description_
+        data (list): _description_
 
     Returns:
-        dictionary: closest value to target timestamp
+        dict: _description_
     """
 
-    target = convertToEpoch(target)
-    return min(data, key=lambda x : abs(x["timestamp"] - target))
+    if isinstance(target, datetime.datetime):
+        target = datetimeToEpoch(target)
+
+    return min(data, key=lambda x : abs(x.timestamp - target))
