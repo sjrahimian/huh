@@ -11,7 +11,7 @@ import requests
 import sys
 
 # 3rd Party Library
-from spacetime import nearestTime, timeRange
+from .spacetime import nearestTime, timeRange
 
 
 class ErrorMetalData(Exception):
@@ -38,7 +38,7 @@ class MetalPrice:
 
 """ Functions that make API calls to get metal price
 """
-def metal_price(self, target, currency, weight, element) -> MetalPrice:
+def metal_price(self, target, currency, weight, metal_type) -> MetalPrice:
     """ Checks a couple apis and gives metal price nearest target date
 
         Only one site is checked for silver price.
@@ -47,7 +47,7 @@ def metal_price(self, target, currency, weight, element) -> MetalPrice:
         target (datetime): 
         currency (str): 
         weight (str): 
-        element (str): 
+        metal_type (str): 
 
     Returns:
         MetalPrice: Package with details regarding metal price
@@ -57,8 +57,8 @@ def metal_price(self, target, currency, weight, element) -> MetalPrice:
     fgo = fetchGoldOrg(times[0], times[1], currency, weight)
     prices = fgpn + fgo # Additional APIs
 
-    if element in ("silver", "ag") and fgpn[1].element == "ag":
-            return fgpn[1]
+    if metal_type in ("silver", "ag") and fgpn[1].element == "ag":
+        return fgpn[1]
 
     n = nearestTime(target, prices)
     
