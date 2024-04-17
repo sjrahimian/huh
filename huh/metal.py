@@ -29,33 +29,36 @@ class MetalPrice:
     """
 
     price: float = 0.00
-    timestamp: int = datetime.datetime.now()
+    timestamp: int = datetime.datetime.now().timestamp()
     currency: str = 'USD'
     weight: str = "oz"
     element: str = "au"
-    site: str = None
+    source: str = None
+
+    def __str__(self):
+        return f"${round(self.price, 2):.2f}/{self.weight} {self.currency}"
 
 
 """ Functions that make API calls to get metal price
 """
-def metal_price(self, target, currency, weight, metal_type) -> MetalPrice:
+def metal_price(target, currency: str="USD", metal_type: str='au') -> MetalPrice:
     """ Checks a couple apis and gives metal price nearest target date
 
-        Only one site is checked for silver price.
+        Only one source is checked for silver price.
 
     Args:
         target (datetime): 
         currency (str): 
-        weight (str): 
         metal_type (str): 
 
     Returns:
         MetalPrice: Package with details regarding metal price
     """
+    
     times = timeRange(target)
     fgpn = fetchGoldPriceNow(currency)
-    fgo = fetchGoldOrg(times[0], times[1], currency, weight)
-    prices = fgpn + fgo # Additional APIs
+    fgo = fetchGoldOrg(times[0], times[1], currency)
+    prices = fgpn + fgo # And any other additional API calls
 
     if metal_type in ("silver", "ag") and fgpn[1].element == "ag":
         return fgpn[1]
@@ -75,7 +78,7 @@ def fetchGoldPriceNow(currency: str="USD"):
         ErrorAcquireMetalData: When failed to retrieve metal data
 
     Returns:
-        _type_: _description_
+        data (list): dataclass with metal price and relevant information
     """
     import requests
 
@@ -91,11 +94,11 @@ def fetchGoldPriceNow(currency: str="USD"):
         raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
 
     data = [
-        MetalPrice(round(results['items'][0]['xauPrice'], 2), results['tsj'], results['items'][0]['curr'], site=title),
-        MetalPrice(round(results['items'][0]['xagPrice'], 2), results['tsj'], results['items'][0]['curr'], element='ag', site=title)
+        MetalPrice(round(results['items'][0]['xauPrice'], 2), results['tsj'], results['items'][0]['curr'], source=title),
+        MetalPrice(round(results['items'][0]['xagPrice'], 2), results['tsj'], results['items'][0]['curr'], element='ag', source=title)
     ]
 
-    print(data)
+    # print(data)
     return data
 
 def fetchGoldOrg(start, end, currency: str="USD", weight: str="oz"):
@@ -109,6 +112,13 @@ def fetchGoldOrg(start, end, currency: str="USD", weight: str="oz"):
     if not res:
         raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
 
-    data = [ MetalPrice(round(el[1], 2), el[0], currency, weight, site=title) for el in res['chartData'][currency] ]
+
+    # print(res)
+    try:
+        data = [ MetalPrice(round(el[1], 2), el[0], currency, weight, source=title) for el in res['chartData'][currency] ]
+    except KeyError:
+        print("Could not retrieve historic metal price data.")
+        sys.exit(-1)
+
     return data
 
