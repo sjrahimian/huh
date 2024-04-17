@@ -1,7 +1,9 @@
 # Custom
 notes*.txt
 *.log
-*.cfg
+*.ini
+*.conf
+*.csv
 .vscode/
 
 # Byte-compiled / optimized / DLL files
