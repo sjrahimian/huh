@@ -8,15 +8,17 @@ Load the customizable settings defined in 'config.ini', and setup the logger set
 
 # Standard library
 import argparse
+from datetime import datetime
 import re
 import configparser
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 import sys
-from huh.huquq import Huququllah
 
+# Local Imports
 from huh.__init__ import __title__
+from .huquq import HuququLabels
 
 class IncorrectConfigValue(ValueError):
     """ Incorrect value exception class for errors from this module. """
@@ -26,12 +28,11 @@ class MissingConfigValue(ValueError):
 
 
 class Configuration():
-    def __init__(self, file, log):
+    def __init__(self, file, log=Path("app.log")):
         self.file = Path(file)
         self.config = self._load()
         self.validateConfig(self.config)
-        if log:
-            self._prepareLogger(Path(self.config['LOGGER']['filename']))
+        # self._prepareLogger(log)
     
     @property
     def conf(self):
@@ -67,11 +68,6 @@ class Configuration():
             raise MissingConfigValue(f'Missing value for: [{section}].\nAdd either address or latitude/longitude.')                        
         
         # Check values
-        section = 'HUQUQ'
-        val = cfg[section]['metal']
-        if val not in ('silver', 'gold'):
-            raise IncorrectConfigValue(f'[{section}] > metal value is invalid: "{val}"')
-
         section = 'FISCAL'
         val = cfg[section]['time']
         if val not in ('dawn', 'sunrise', 'noon', 'sunset', 'dusk', 'now'):
@@ -79,7 +75,7 @@ class Configuration():
                 raise IncorrectConfigValue(f'[{section}] > time value is invalid: "{val}"')
                 sys.exit(1)
             try:
-                cfg[section]['time'] = dt.datetime.strptime(val, "%H:%M")
+                datetime.strptime(val, "%H:%M")
             except ValueError:
                 print(f'[{section}] > time value is not a valid 24-hour format: "{val}"')
                 sys.exit(1)
@@ -88,8 +84,9 @@ class Configuration():
         if not re.fullmatch("[0-1][0-9]-[0-3][0-9]", val):
             raise IncorrectConfigValue(f'[{section}] > date value is invalid: "{val}"')
             sys.exit(1)
+
         try:
-            cfg[section]['date'] = dt.datetime.strptime(val, "%m-%d")
+            datetime.strptime(val, "%m-%d")
         except ValueError:
             print(f'[{section}] > fiscal date value is not a valid "MM-DD" format: "{val}"')
             sys.exit(1)
@@ -101,21 +98,28 @@ class Configuration():
             handler = RotatingFileHandler(filename=fn)
             
             # define how logger should output
-            logging.basicConfig(format='%(asctime)s; %(levelname)s; %(name)s; %(message)s', 
-                level=logging.INFO,
-                handlers=[handler])
-            logging.debug("Application started in development mode; level=logging.DEBUG")
+            logging.basicConfig(format='%(message)s', 
+                level=logging.INFO, handlers=[handler])
 
         except Exception as e:
             print(f"Error in logger settings: \n{e}")
             sys.exit(-1)
 
-def arguments():
-    parser = argparse.ArgumentParser(prog=f'{__title__}', description='Calculate HQUH')
 
-    parser.add_argument('amount', type=float, help='The amount after expenses to pay HQUH on.')
-    parser.add_argument('-u', '--unit', type=float, help='One unit of HQUH (equal to 19 mithqals).')
-    parser.add_argument('-f', '--fetch', type=float, help='Fetch the metal prices.')
-    parser.add_argument('-l', '--log', action='store_true', help='Record to file.')
+class MetalPriceAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if values and not re.fullmatch("([a-zA-Z]{3}),([0-9]+.?[0-9]{0,2}),(troy\soz|t\soz|toz|oz|grams|gram|g){1}", values):
+                raise ValueError("Incorrect format for custom gold price: '[currency],[price],[weight]'\n(e.g., 'usd,1,troy oz)'\n")
+
+        setattr(namespace, self.dest, values)
+
+def arguments():
+    parser = argparse.ArgumentParser(prog=f'{__title__}', description=f'{HuququLabels.diacritic_upper} calculator.')
+
+    parser.add_argument('amount', type=float, help=f'The amount of wealth after expenses to pay {HuququLabels.diacritic_lower} on.')
+    parser.add_argument('-b', '--basic', type=float, default=None, help=f'One basic unit equal to 19 {HuququLabels.mithqal}.')
+    parser.add_argument('-d', '--detail', action='store_true', help='Give full detail.')
+    parser.add_argument('-p', '--price', type=str, action=MetalPriceAction, default=None, help="Provide the gold price: '[currency],[price],[weight]'.")
+    # parser.add_argument('-l', '--log', action='store_false', help='Record to file.')
 
     return parser.parse_args()
