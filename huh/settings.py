@@ -41,14 +41,14 @@ class Configuration():
     def _load(self):
         try:
             if not self.file.is_file():
-                raise FileNotFoundError("Could not find file; missing 'config.ini'.")
+                raise FileNotFoundError(f"Could not find {self.file} file.")
             else:
                 temp = configparser.ConfigParser()
                 temp.read(self.file)
                 return temp
             
         except FileNotFoundError as e:
-            print(f"[ERROR] {e}\n 'file': {self.file}\n")
+            print(f"[ERROR] {e}")
             sys.exit(-1)
 
     def validateConfig(self, cfg):
