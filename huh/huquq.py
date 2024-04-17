@@ -1,7 +1,9 @@
 # Standard library
+from dataclasses import dataclass, asdict
 import json
 from pathlib import Path
 import sys
+import csv
 
 # 3rd Party Library
 
@@ -22,132 +24,135 @@ import sys
 
 """
 
-class JSONCommentDecoder(json.JSONDecoder):
-    def __init__(self, **kw):
-        super().__init__(**kw)
+@dataclass
+class HuququLabels:
+    name: str = "huququ'llah"
+    diacritic_lower: str = "ḥuqúqu'lláh"
+    diacritic_upper: str = "Ḥuqúqu'lláh"
+    short: str = "Hq"
+    unit_symbol: str = "Ͱ"
+    mithqal: str = "mit͟hqál"
+    mithqal_unit: str = "mq"
+    nakhud: str = "nak͟hud"
+    nakhud_unit: str = "nh"
 
-    def decode(self, s: str):
-        s = '\n'.join( line if not line.lstrip().startswith('//') else '' for line in s.split('\n') )
-        return super().decode(s)
+    def dict(self):
+        return { k: v for k, v in asdict(self).items() }
 
-class Huququllah():
+@dataclass
+class Huququllah:
     _PERCENT = 0.19
-    name = "huquq'u'llah"
-    diacritic = "ḥuqúqu'lláh"
-    diacritic_capital = "Ḥuqúqu'lláh"
-    short = "Hq"
-    symbol = "Ͱ"
-     
-    def __init__(self, metalPrice: float=0.00, metalType: str="", weight: str="oz", unit: str="short"):
+    _GRAMS = 69.192
+    _MITHQAL = 19
+    _TROYOZ = 2.22457446
 
-        # load custom labels from json
-        self._labels = { "name": self.name, "symbol": self.symbol, "short": self.short, "diacritic": self.diacritic }
-        if (fn:= Path(f"{Path().cwd().parent}/labels.jsonc")).exists():
-            with open(fn, 'r') as f:
-                self._labels = self._labels | json.load(f, cls=JSONCommentDecoder)
+    basic, remainder, payable = None, None, None
+    wealth: float = None
+    price: float = None
+    weight: str = "toz"
+
+    def __init__(self, wealth=None, price=None, weight: str='toz'):
+        self.wealth = wealth
+        self.price = price
+        self.weight = weight
+
+        # Calculate Huququllah
+        self._basicSum()
+        self._remainder()    # Gives the remainder of wealth that has not reached a full unit (if any)
+        self._payable()
+
+
+    def _basicSum(self) -> float:
+        """'...basic sum on which Ḥuqúqu'lláh is payable is nineteen mit͟hqáls of gold.' 
+                - BH, #35, Ḥuqúqu'lláh: The Right of God (2007)
         
-        self._mPrice = metalPrice
-        self._mType = metalType
-        self._weight = weight.lower()
-        self._unit = self._labels[unit.lower()]
-        self._basic, self._remainder = None, None
-        self._calculate_basic_sum()
-    
-    @property
-    def percent(self) -> float:
-        return self._PERCENT
+            Multiplying the cost of gold/gram to 69.192g will calculate 19 mit͟hqáls of 
+                gold in dollars, i.e., the basic sum (one unit).
 
-    @property
-    def basic(self) -> float:
-        return self._basic
-
-    @property
-    def remainder(self) -> float:
-        return self._remainder
-    
-    @remainder.setter
-    def remainder(self, val: float):
-        self._remainder = val
-
-    @property
-    def unit(self) -> str:
-        """ Selected label """
-        return self._unit
-    
-    @property
-    def labels(self):
-        return self._labels
-
-    @labels.setter
-    def labels(self, value: dict):
-        self._labels = value | self._labels
-
-    def _calculate_basic_sum(self) -> None:
-        """ '...basic sum on which Huqúqu'lláh is payable is nineteen mithqáls of gold.' 
-                - BH, #35, Huqúqu'lláh: The Right of God (2007)
-        
-            Multiplying the cost of gold/gram to 69.192g will calculate 19 mithqāls of 
-                gold in dollars, i.e., the basic sum (one Ḥuqúqu'lláh unit).
+                nh - nak͟hud
+                mq - mit͟hqál
+                 g - grams
+                oz - troy ounce
         
             Conversion:
-                19Nk =  1Mq =  3.642g
+                 19Nk =  1Mq =  3.642g
                 361Nk = 19Mq = 69.192g
 
             Calculation:
-                X = gold $ per g * 69.192g
-                        or
-                X = gold $ per g * 3.642g * 19
+                19 mq = $gold/g * 69.192g
+                           or
+                19 mq = $gold/g * (3.642g * 19mq)
 
-            :return None: monetary equivalent to 19 mithqāls of gold (basic sum)
+        Raises:
+            ValueError: Not able to determine weight conversion from given unit
+
+        Returns:
+            float: basic sum that is equivalent to 19 mit͟hqáls of gold
         """
-        GRAMS = 69.192
-        MITHQAL = 19
-        TROY_OZ = 2.22457446
 
-        if self._weight in ("troy oz", "t oz", "toz"):
-            factor = TROY_OZ
-        elif self._weight in ("gram", "grams", "g"):
-            factor = GRAMS
-        elif self._weight in ("mithqal", "mithqals", "mq"):
-            factor = MITHQAL
+        if not self.price:
+            raise ValueError("Provide gold price to calculate basic sum (equal to 19 mit͟hqáls of gold).")
+            sys.exit(1)
+
+        if self.weight in ("troy oz", "t oz", "toz", "oz"):
+            factor = self._TROYOZ
+        elif self.weight in ("gram", "grams", "g"):
+            factor = self._GRAMS
+        elif self.weight in ("mithqal", "mithqals", "mq"):
+            factor = self._MITHQAL
         else:
-            raise ValueError(f"Incorrect weight provided: {self._weight}")
-
-        self._basic = self._mPrice * factor
-
-
-    def payable(self, wealth: float) -> float:
-        """ Compute payable amount of Ḥuqúqu'lláh.
-            
-            (wealth - remainder) * 19%
+            raise ValueError(f"Unrecognized weight provided: {self.weight}")
+            sys.exit(1)
         
-        :param float: Monetary wealth after expenses have been deducted
-        
-        :return float: Payment owing for Ḥuqúqu'lláh
-        """
-        if self._basic is None:
-            raise ValueError(f"Provide {self._mType} price first to find basic sum amount.")
+        self.basic = self.price * factor
+        return self.basic
 
-        if wealth < self._basic:
-            return 0.00
-        
-        # Gives the remainder of wealth that has not reached a full unit (if any)
+    def _remainder(self) -> float:
         try:
-            self._remainder = wealth % self._basic
-            pay = (wealth - self._remainder) * self._PERCENT
+            self.remainder = self.wealth % self.basic
         except ZeroDivisionError:
-            raise ValueError(f"[ERROR] Failed to properly calculate {self._unit} basic amount based on {self._mType}.")
+            print("Basic sum cannot be equal to zero.")
             sys.exit(-1)
-            # return 0.00
 
-        print(f"Your accrued wealth contains {wealth // self._basic} {self._unit}.")
-        print(f"       Amount of wealth that {self._unit} will be payable on: ${format(round((wealth - self._remainder), 2), '.2f')}.")
-        print(f"Remainder of wealth that will not have {self._unit} paid: ${round(self._remainder, 2)}.\n\n")
-        print("You owe", pay)
+    def _payable(self) -> float:
+        """Provide the payable amount of Ḥuqúqu'lláh.
+            
+            (wealth - remainder) * 0.19
+
+        Args:
+            wealth (float):  Wealth after expenses have been deducted and that has not had Huququ'llah paid
+
+        Raises:
+            ValueError: Missing basic sum (equivalent to 19 mit͟hqáls of gold)
+
+        Returns:
+            float: payable amount of Huququ'llah
+        """
+
+        if self.basic is None:
+            raise ValueError(f"Provide gold price first to find basic sum amount.")
+
+        if self.wealth < self.basic:
+            self.payable = 0.00
+        else: 
+            self.payable = (self.wealth - self.remainder) * self._PERCENT
         
-        return pay
+        return self.payable
 
     def __str__(self):
         """ String representation of this object """
-        return f"${round(self._basic, 2)}{self._unit}"
+        return f"Payable: ${round(self.payable, 2):.2f}\n"
 
+    def report(self):
+        print(f"Accrued wealth is {self.wealth // self.basic}x over the 19{HuququLabels.mithqal_unit} of gold.")
+        print(f"Amount of wealth that {HuququLabels.diacritic_lower} will be payable on: ${round((self.wealth - self.remainder), 2):.2f}.")
+        print(" ~ ~ ~ ")
+        print(f"Basic: ${round(self.basic, 2):.2f} (equivalent to 19{HuququLabels.mithqal_unit} of gold)")
+        print(f"Remainder of wealth: ${round(self.remainder, 2):.2f} ({HuququLabels.diacritic_lower} not paid)")
+        print(f"Payable: ${round(self.payable, 2):.2f}\n")
+
+
+def record(pkg, file=Path("huququllah_record.csv")):
+    with open(file, 'a+', newline="") as csvfile:
+        csvwriter = csv.writer(csvfile)
+        csvwriter.writerow(pkg)
