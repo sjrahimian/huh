@@ -26,18 +26,26 @@ import csv
 
 @dataclass
 class HuququLabels:
+    choice: str = "name"
+
     name: str = "huququ'llah"
     diacritic_lower: str = "ḥuqúqu'lláh"
     diacritic_upper: str = "Ḥuqúqu'lláh"
-    short: str = "Hq"
+    unit: str = "hq"
     unit_symbol: str = "Ͱ"
-    mithqal: str = "mit͟hqál"
+    mithqal: str = "mithqal"
+    mithqal_diacritic: str = "mit͟hqál"
     mithqal_unit: str = "mq"
-    nakhud: str = "nak͟hud"
+    nakhud: str = "nakhud"
+    nakhud_diacritic: str = "nak͟hud"
     nakhud_unit: str = "nh"
+
 
     def dict(self):
         return { k: v for k, v in asdict(self).items() }
+
+    def __str__(self):
+        return (self.dict())[self.choice]
 
 @dataclass
 class Huququllah:
@@ -143,9 +151,9 @@ class Huququllah:
         """ String representation of this object """
         return f"Payable: ${round(self.payable, 2):.2f}\n"
 
-    def report(self):
+    def report(self, selected="diacritic_lower"):
         print(f"Accrued wealth is {self.wealth // self.basic}x over the 19{HuququLabels.mithqal_unit} of gold.")
-        print(f"Amount of wealth that {HuququLabels.diacritic_lower} will be payable on: ${round((self.wealth - self.remainder), 2):.2f}.")
+        print(f"Amount of wealth that {HuququLabels(choice=selected)} will be payable on: ${round((self.wealth - self.remainder), 2):.2f}.")
         print(" ~ ~ ~ ")
         print(f"Basic: ${round(self.basic, 2):.2f} (equivalent to 19{HuququLabels.mithqal_unit} of gold)")
         print(f"Remainder of wealth: ${round(self.remainder, 2):.2f} ({HuququLabels.diacritic_lower} not paid)")
