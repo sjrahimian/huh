@@ -137,3 +137,13 @@ def nearestTime(target: (datetime, int), data: list):
         target = datetimeToEpoch(target)
 
     return min(data, key=lambda x : abs(x.timestamp - target))
+
+
+def fixFiscalDate(d):
+    if d.year == 1900:
+        d = d.replace(year=datetime.datetime.now().year)
+
+    if d.date() > datetime.datetime.now().date():
+        d = d.replace(year=(datetime.datetime.now().year - 1))
+    
+    return d
