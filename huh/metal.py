@@ -66,7 +66,7 @@ def metal_price(target, currency: str="USD", metal_type: str='au') -> MetalPrice
     n = nearestTime(target, prices)
 
     if n.currency != currency:
-        print(f"Failed to obtain gold price in {currency} from {m.source}; switched to '{n.currency}'.")
+        print(f"Failed to obtain gold price in {currency} from {n.source}; switched to '{n.currency}'.")
         
     return n
 
@@ -93,19 +93,19 @@ def fetchGoldPriceNow(currency: str="USD"):
 
     results = requests.get(url, headers=headers).json()   
     if not results:
-        raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
+        raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {site}")
         sys.exit(-1)
     elif not results['items']:
         url = f"https://data-asg.goldprice.org/dbXRates/USD"
         results = requests.get(url, headers=headers).json()
 
         if not results:
-            raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
+            raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {site}")
             sys.exit(-1)
 
     data = [
-        MetalPrice(round(results['items'][0]['xauPrice'], 2), results['tsj'], results['items'][0]['curr'], source=title),
-        MetalPrice(round(results['items'][0]['xagPrice'], 2), results['tsj'], results['items'][0]['curr'], element='ag', source=title)
+        MetalPrice(round(results['items'][0]['xauPrice'], 2), results['tsj'], results['items'][0]['curr'], source=site),
+        MetalPrice(round(results['items'][0]['xagPrice'], 2), results['tsj'], results['items'][0]['curr'], element='ag', source=site)
     ]
 
     # print(data)
@@ -120,10 +120,13 @@ def fetchGoldOrg(start, end, currency: str="USD", weight: str="oz"):
 
     res = requests.get(url).json()
     if not res:
-        raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
+        raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {site}")
     
+    if currency.upper() == (curr:= list(res['chartData'].keys())[0].upper()):
+        curr = currency
+
     try:
-        data = [ MetalPrice(round(el[1], 2), el[0], res['chartData'].keys()[0], weight, source=title) for el in res['chartData'][res['chartData'].keys()[0]] ]
+        data = [ MetalPrice(round(el[1], 2), el[0], curr, weight, source=site) for el in res['chartData'][curr] ]
     except KeyError:
         print(res)
         print("Could not retrieve historic metal price data.")
