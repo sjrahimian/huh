@@ -101,7 +101,8 @@ def fetchGoldPriceNow(currency: str="USD"):
 
         if not results:
             raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {site}")
-            sys.exit(-1)
+            return []
+            # sys.exit(-1)
 
     data = [
         MetalPrice(round(results['items'][0]['xauPrice'], 2), results['tsj'], results['items'][0]['curr'], source=site),
@@ -126,10 +127,14 @@ def fetchGoldOrg(start, end, currency: str="USD", weight: str="oz"):
         curr = currency
 
     try:
+        if len(curr) != 3:
+            raise ValueError("Unable to get correct currency value.")
         data = [ MetalPrice(round(el[1], 2), el[0], curr, weight, source=site) for el in res['chartData'][curr] ]
-    except KeyError:
-        print(res)
-        print("Could not retrieve historic metal price data.")
+    except ValueError as e:
+        # print(e)
+        return []
+    except KeyError as e:
+        print(" [ERROR] Issue with JSON key.")
         sys.exit(-1)
 
     return data
