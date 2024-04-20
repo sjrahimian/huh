@@ -64,7 +64,10 @@ def metal_price(target, currency: str="USD", metal_type: str='au') -> MetalPrice
         return fgpn[1]
 
     n = nearestTime(target, prices)
-    
+
+    if n.currency != currency:
+        print(f"Failed to obtain gold price in {currency} from {m.source}; switched to '{n.currency}'.")
+        
     return n
 
 
@@ -80,9 +83,8 @@ def fetchGoldPriceNow(currency: str="USD"):
     Returns:
         data (list): dataclass with metal price and relevant information
     """
-    import requests
 
-    title = "goldprice.org"
+    site = "goldprice.org"
     url = f"https://data-asg.goldprice.org/dbXRates/{currency}"
 
     headers = {
@@ -90,8 +92,16 @@ def fetchGoldPriceNow(currency: str="USD"):
     }
 
     results = requests.get(url, headers=headers).json()   
-    if not results or not results['items']:
+    if not results:
         raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
+        sys.exit(-1)
+    elif not results['items']:
+        url = f"https://data-asg.goldprice.org/dbXRates/USD"
+        results = requests.get(url, headers=headers).json()
+
+        if not results:
+            raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
+            sys.exit(-1)
 
     data = [
         MetalPrice(round(results['items'][0]['xauPrice'], 2), results['tsj'], results['items'][0]['curr'], source=title),
@@ -105,18 +115,17 @@ def fetchGoldOrg(start, end, currency: str="USD", weight: str="oz"):
     
     # grams or oz
 
-    title = "gold.org"
+    site = "gold.org"
     url = f"https://fsapi.gold.org/api/goldprice/v11/chart/price/{currency}/{weight}/{start},{end}"
 
     res = requests.get(url).json()
     if not res:
         raise ErrorAcquireMetalData(f" [ERROR] No data retrieved from {title}")
-
-
-    # print(res)
+    
     try:
-        data = [ MetalPrice(round(el[1], 2), el[0], currency, weight, source=title) for el in res['chartData'][currency] ]
+        data = [ MetalPrice(round(el[1], 2), el[0], res['chartData'].keys()[0], weight, source=title) for el in res['chartData'][res['chartData'].keys()[0]] ]
     except KeyError:
+        print(res)
         print("Could not retrieve historic metal price data.")
         sys.exit(-1)
 
