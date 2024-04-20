@@ -111,12 +111,12 @@ def timeRange(target) -> tuple:
     Returns:
         tuple: A tuple with two integers representing epoch time in the position of (start, end)
     """
-    start = target - datetime.timedelta(minutes=30)
-    end = target + datetime.timedelta(minutes=30)
+    start = target - datetime.timedelta(minutes=45)
+    end = target + datetime.timedelta(minutes=45)
 
     # Prevent program from becoming psychic.
     if end.timestamp() > datetime.datetime.now().timestamp():
-        start = target - datetime.timedelta(hours=1)
+        start = target - datetime.timedelta(hours=2)
         end = datetime.datetime.now()
     
     return (datetimeToEpoch(start), datetimeToEpoch(end))
