@@ -38,8 +38,7 @@ def run():
     try:
         args = arguments()
         print(args)
-        print("\n\n")
-        cfg = None #Configuration("huq.ini").conf
+        cfg = Configuration("huq.ini").conf
     except ValueError as e:
         print(e)
         sys.exit(-1)
@@ -70,7 +69,7 @@ def run():
 
         # Fetch the price of gold
         tmpCurr = cfg['HUQUQ']['currency'].upper() if 'currency' in cfg['HUQUQ'] else None
-        c = args.curr.upper() if args.curr else tmp
+        c = args.curr.upper() if args.curr else tmpCurr
         m = mp_wrapper(target_time, args.price, c)
 
     if not m:
@@ -100,9 +99,7 @@ def run():
 
     if cfg:
         # Record: created date, retrieved date, metal price, metal weight, metal currency, wealth, payable
-        if 'file' in cfg['CSV']:
+        if 'file' in cfg['RECORD']:
             pkg = [datetime.now(), target_time] + floatFmt(m.price)+ [m.weight, m.currency, m.source] + floatFmt(huq.wealth, huq.payable)
-            if (f:= Path(cfg['CSV']['file'])).is_dir():
-                record(f, pkg)
-            else:
-                record(pkg)
+            if (f:= Path(str(cfg['RECORD']['file']))).parent.is_dir():
+                record(pkg, f)
