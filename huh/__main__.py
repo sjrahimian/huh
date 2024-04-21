@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-""" This is MAIN
+""" This is MAIN part of the HUH program that handles that calls the other modules.
 """
 
 # Standard library
@@ -9,8 +9,6 @@ from datetime import datetime
 from pathlib import Path
 import ssl
 import logging
-
-# 3rd Party Library
 
 # cfg_local imports
 from huh.settings import arguments, Configuration
@@ -37,7 +35,6 @@ def mp_wrapper(tt, usrPrice=None, curr=None):
 def run():
     try:
         args = arguments()
-        print(args)
         cfg = Configuration("huq.ini").conf
     except ValueError as e:
         print(e)
