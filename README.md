@@ -1,22 +1,24 @@
 # huh: ḥuqúqu'lláh helper
 
-A simple program to help calculate 19 mithqals of gold and 19% of that; a ḥuqúqu'lláh helper.
+Help calculate 19 mit͟hqáls of gold and 19% of one's wealth; a ḥuqúqu'lláh helper. The program will output the gold price and any payable amount of ḥuqúqu'lláh.
 
 ## Setup
 
+Planning to release an *.exe file.
+
 ### Development
 
-Setup a virtual environment and install the necessary packages.
+Create a virtual environment and install the necessary packages.
 
 ```bash
+pip install astral geopy requests timezonefinder
+    # or
 pip install -r requirements.txt
 ```
 
 Python packages used:
 
+* astral
+* geopy
 * requests
 * timezonefinder
-* geopy
-* astral
-* pytz
-* CurrencyConverter
