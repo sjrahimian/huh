@@ -66,7 +66,7 @@ def metal_price(target, currency: str="USD", metal_type: str='au') -> MetalPrice
     n = nearestTime(target, prices)
 
     if n.currency != currency:
-        print(f"Failed to obtain gold price in {currency} from {n.source}; switched to '{n.currency}'.")
+        print(f'Failed to obtain gold price in {currency} from "{n.source}"; switched to {n.currency}.')
         
     return n
 
@@ -109,13 +109,10 @@ def fetchGoldPriceNow(currency: str="USD"):
         MetalPrice(round(results['items'][0]['xagPrice'], 2), results['tsj'], results['items'][0]['curr'], element='ag', source=site)
     ]
 
-    # print(data)
     return data
 
 def fetchGoldOrg(start, end, currency: str="USD", weight: str="oz"):
     
-    # grams or oz
-
     site = "gold.org"
     url = f"https://fsapi.gold.org/api/goldprice/v11/chart/price/{currency}/{weight}/{start},{end}"
 
@@ -128,7 +125,8 @@ def fetchGoldOrg(start, end, currency: str="USD", weight: str="oz"):
 
     try:
         if len(curr) != 3:
-            raise ValueError("Unable to get correct currency value.")
+            raise ValueError("Unable to get correct currency key.")
+
         data = [ MetalPrice(round(el[1], 2), el[0], curr, weight, source=site) for el in res['chartData'][curr] ]
     except ValueError as e:
         # print(e)
