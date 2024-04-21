@@ -86,6 +86,8 @@ def run():
     
     # Full output
     if args.detail:
+        print(f"~~ HUH: {HuququLabels.diacritic_upper} Helper ~~\n")
+
         if not args.price:
             print(f'Date & time for price search: {target_time}')
             print(f'Date & time for gold price: {st.epochToDatetime(m.timestamp)}')
@@ -94,8 +96,8 @@ def run():
         print(f"Gold price ({m.source}): {m}")
         huq.report()
     else:
-        print(m)
-        print(huq)
+        print(f"Gold Price: {m}")
+        print(f"   Payable: {str(huq)} {m.currency}")
 
     if cfg:
         # Record: created date, retrieved date, metal price, metal weight, metal currency, wealth, payable

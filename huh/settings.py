@@ -114,13 +114,12 @@ class MetalPriceAction(argparse.Action):
         setattr(namespace, self.dest, values)
 
 def arguments():
-    parser = argparse.ArgumentParser(prog=f'{__title__}', description=f'{HuququLabels.diacritic_upper} calculator.')
+    parser = argparse.ArgumentParser(description=f'Help calculate {HuququLabels.diacritic_upper} tax by retrieving the price of gold and performing the required operations.', epilog=f"The program will output the gold price and any payable amount of {HuququLabels.diacritic_lower}.")
 
-    parser.add_argument('amount', type=float, help=f'The amount of wealth after expenses to pay {HuququLabels.diacritic_lower} on.')
+    parser.add_argument('amount', type=float, help=f'The amount of wealth after expenses to pay {HuququLabels.name} on.')
     parser.add_argument('-b', '--basic', type=float, default=None, help=f'One basic unit equal to 19 {HuququLabels.mithqal}.')
-    parser.add_argument('-c', '--curr', type=str, default=None, help=f'Convert currency (override configuration file).')
-    parser.add_argument('-d', '--detail', action='store_true', help='Give full detail.')
+    parser.add_argument('-c', '--curr', type=str, default=None, help=f'Convert currency (overrides configuration file).')
+    parser.add_argument('-d', '--detail', action='store_true', help='Detailed output.')
     parser.add_argument('-p', '--price', type=str, action=MetalPriceAction, default=None, help="Provide the gold price: '[currency],[price],[weight]'.")
-    # parser.add_argument('-l', '--log', action='store_false', help='Record to file.')
 
     return parser.parse_args()

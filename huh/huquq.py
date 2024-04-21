@@ -149,7 +149,7 @@ class Huququllah:
 
     def __str__(self):
         """ String representation of this object """
-        return f"Payable: ${round(self.payable, 2):.2f}\n"
+        return f"${round(self.payable, 2):.2f}"
 
     def report(self, selected="diacritic_lower"):
         print(f"Accrued wealth is {self.wealth // self.basic}x over the 19{HuququLabels.mithqal_unit} of gold.")
