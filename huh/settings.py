@@ -119,8 +119,8 @@ def arguments():
                 License, v. 2.0. If a copy of the MPL was not distributed with this
                 file, You can obtain one at http://mozilla.org/MPL/2.0/."""
 
-    dcrip = f'Help calculate {HuququLabels.diacritic_upper} tax by retrieving the price of gold and performing the required operations. The program will output the gold price and any payable amount of {HuququLabels.diacritic_lower}.'
-    parser = argparse.ArgumentParser(description=dcrip, epilog=lic)
+    descrip = f'Help calculate the {HuququLabels.diacritic_upper} ("Right of God") voluntary tax by retrieving the price of gold and performing required operations. The program will output the gold price and any payable amount of {HuququLabels.diacritic_lower}.'
+    parser = argparse.ArgumentParser(description=descrip, epilog=lic)
 
     parser.add_argument('amount', type=float, help=f'Amount of wealth (after expenses) to pay {HuququLabels.name} on.')
     parser.add_argument('-b', '--basic', type=float, default=None, help=f'User can provide the basic unit equal to 19 {HuququLabels.mithqal}.')
