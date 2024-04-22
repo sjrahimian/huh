@@ -2,7 +2,7 @@
 
 """ Settings for the project.
 
-Load the customizable settings defined in 'config.ini', and setup the logger settings.
+# Load the customizable settings defined in the configuration file.
 
 """ 
 
@@ -17,7 +17,7 @@ from pathlib import Path
 import sys
 
 # Local Imports
-from huh.__init__ import __title__
+from huh.__init__ import __title__, __author__, __copyright__
 from .huquq import HuququLabels
 
 class IncorrectConfigValue(ValueError):
@@ -114,12 +114,34 @@ class MetalPriceAction(argparse.Action):
         setattr(namespace, self.dest, values)
 
 def arguments():
-    parser = argparse.ArgumentParser(description=f'Help calculate {HuququLabels.diacritic_upper} tax by retrieving the price of gold and performing the required operations.', epilog=f"The program will output the gold price and any payable amount of {HuququLabels.diacritic_lower}.")
+    lic = f"""{__title__}  {__copyright__}  {__author__}
+                This Source Code Form is subject to the terms of the Mozilla Public
+                License, v. 2.0. If a copy of the MPL was not distributed with this
+                file, You can obtain one at http://mozilla.org/MPL/2.0/."""
 
-    parser.add_argument('amount', type=float, help=f'The amount of wealth after expenses to pay {HuququLabels.name} on.')
-    parser.add_argument('-b', '--basic', type=float, default=None, help=f'One basic unit equal to 19 {HuququLabels.mithqal}.')
+    dcrip = f'Help calculate {HuququLabels.diacritic_upper} tax by retrieving the price of gold and performing the required operations. The program will output the gold price and any payable amount of {HuququLabels.diacritic_lower}.'
+    parser = argparse.ArgumentParser(description=dcrip, epilog=lic)
+
+    parser.add_argument('amount', type=float, help=f'Amount of wealth (after expenses) to pay {HuququLabels.name} on.')
+    parser.add_argument('-b', '--basic', type=float, default=None, help=f'User can provide the basic unit equal to 19 {HuququLabels.mithqal}.')
     parser.add_argument('-c', '--curr', type=str, default=None, help=f'Convert currency (overrides configuration file).')
-    parser.add_argument('-d', '--detail', action='store_true', help='Detailed output.')
-    parser.add_argument('-p', '--price', type=str, action=MetalPriceAction, default=None, help="Provide the gold price: '[currency],[price],[weight]'.")
+    parser.add_argument('-d', '--detail', action='store_true', help=f'Detailed output includes information such as 19 {HuququLabels.mithqal} equivalent, remainder, dates & times of gold prices, etc.')
+    parser.add_argument('-p', '--price', type=str, action=MetalPriceAction, default=None, help="User can provide the gold price in this format and order: '[currency],[price],[weight]'.")
 
     return parser.parse_args()
+
+
+
+""" 
+    huh: ḥuqúqu'lláh helper Copyright (C) 2024  Sama Rahimian
+
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+"""
+
