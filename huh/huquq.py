@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+""" Classes for calculations and labels related to the right of god.
+"""
+
 # Standard library
 from dataclasses import dataclass, asdict
 import json
@@ -5,11 +10,8 @@ from pathlib import Path
 import sys
 import csv
 
-# 3rd Party Library
-
-# Local Imports
-
-"""Symbol Reasoning
+"""
+    Symbol Reasoning - DRAFT
 
     One option is the Greek uppercase Ϙ (qoppa) to repersent Huquq, which decends from the Phoenician Qoph (𐤒), which in turn is 
     ancestor to the Arabic qāf (the twenty-first letter of the Arabic alphabet) and one of the letters in huququ'llah. Qoph is the 
@@ -26,7 +28,7 @@ import csv
 
 @dataclass
 class HuququLabels:
-    choice: str = "name"
+    default: str = "name"
 
     name: str = "huququ'llah"
     diacritic_lower: str = "ḥuqúqu'lláh"
@@ -45,7 +47,7 @@ class HuququLabels:
         return { k: v for k, v in asdict(self).items() }
 
     def __str__(self):
-        return (self.dict())[self.choice]
+        return (self.dict())[self.default]
 
 @dataclass
 class Huququllah:
@@ -153,7 +155,7 @@ class Huququllah:
 
     def report(self, selected="diacritic_lower"):
         print(f"Accrued wealth is {self.wealth // self.basic}x over the 19{HuququLabels.mithqal_unit} of gold.")
-        print(f"Amount of wealth that {HuququLabels(choice=selected)} will be payable on: ${round((self.wealth - self.remainder), 2):.2f}.")
+        print(f"Amount of wealth that {HuququLabels(default=selected)} will be payable on: ${round((self.wealth - self.remainder), 2):.2f}.")
         print(" ~ ~ ~ ")
         print(f"Basic: ${round(self.basic, 2):.2f} (equivalent to 19{HuququLabels.mithqal_unit} of gold)")
         print(f"Remainder of wealth: ${round(self.remainder, 2):.2f} ({HuququLabels.diacritic_lower} not paid)")

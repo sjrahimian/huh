@@ -1,9 +1,7 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """ Settings for the project.
-
-# Load the customizable settings defined in the configuration file.
-
+    Load the customizable settings defined in the configuration file.
 """ 
 
 # Standard library

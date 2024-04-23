@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 
 """ This is MAIN part of the HUH program that handles that calls the other modules.
 """
