@@ -93,12 +93,19 @@ def run():
         print(f"Gold price ({m.source}): {m}")
         huq.report()
     else:
-        print(f"Gold Price: {m}")
+        print(f"Gold price ({m.source}): {m}")
         print(f"   Payable: {str(huq)} {m.currency}")
 
+    # Create record
+    headers = ["created entry", "search target", "gold price retrieved", "gold price", "weight", "currency", "wealth", "payable"]
+    pkg = [datetime.now(), target_time, m.timestamp] + floatFmt(m.price)+ [m.weight, m.currency, m.source] + floatFmt(huq.wealth, huq.payable)
     if cfg:
-        # Record: created date, retrieved date, metal price, metal weight, metal currency, wealth, payable
         if 'file' in cfg['RECORD']:
-            pkg = [datetime.now(), target_time] + floatFmt(m.price)+ [m.weight, m.currency, m.source] + floatFmt(huq.wealth, huq.payable)
-            if (f:= Path(str(cfg['RECORD']['file']))).parent.is_dir():
+            if (f:= Path(cfg['RECORD']['file'])).parent.is_dir():
                 record(pkg, f)
+    else:
+        if args.file:
+            if (f:= Path(args.file)).parent.is_dir():
+                record(pkg, f)
+
+                
