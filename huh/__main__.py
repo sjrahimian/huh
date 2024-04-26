@@ -38,7 +38,8 @@ def mp_wrapper(tt, usrPrice=None, curr=None):
 def run():
     try:
         args = arguments()
-        cfg = Configuration("huq.ini").conf
+        configFile = args.filename if Path(args.filename).exists() else "huh.ini"
+        cfg = Configuration(configFile).conf
     except ValueError as e:
         print(e)
         sys.exit(-1)
@@ -107,8 +108,8 @@ def run():
             if (f:= Path(cfg['RECORD']['file'])).parent.is_dir():
                 record(pkg, f)
     else:
-        if args.file:
-            if (f:= Path(args.file)).parent.is_dir():
+        if args.output:
+            if (f:= Path(args.output)).parent.is_dir():
                 record(pkg, f)
 
                 
