@@ -112,15 +112,15 @@ class MetalPriceAction(argparse.Action):
         setattr(namespace, self.dest, values)
 
 def arguments():
-    lic = f"""{__title__}  {__copyright__}  {__author__}
+    lic = f"""{__title__}  {__copyright__}  {", ".join(__author__)}.
                 This Source Code Form is subject to the terms of the Mozilla Public
                 License, v. 2.0. If a copy of the MPL was not distributed with this
                 file, You can obtain one at http://mozilla.org/MPL/2.0/."""
 
-    descrip = f'Help calculate the {HuququLabels.diacritic_upper} ("Right of God") voluntary tax by retrieving the price of gold and performing required operations. The program will output the gold price and any payable amount of {HuququLabels.diacritic_lower}.'
-    parser = argparse.ArgumentParser(description=descrip, epilog=lic)
+    describe = f'Help calculate the voluntary tax {HuququLabels.huquq_diacritic_upper} ("Right of God") by retrieving the price of gold and performing required operations. The program will output the gold price and any payable amount of {HuququLabels.huquq_diacritic_upper}.'
+    parser = argparse.ArgumentParser(description=describe, epilog=lic)
 
-    parser.add_argument('amount', type=float, help=f'Amount of wealth (after expenses) to pay {HuququLabels.name} on.')
+    parser.add_argument('amount', type=float, help=f'Amount of wealth or capital (after debts and expenses) to have {HuququLabels.huquq.capitalize()} calculated on.')
     parser.add_argument('-b', '--basic', type=float, default=None, help=f'User can provide the basic unit equal to 19 {HuququLabels.mithqal}.')
     parser.add_argument('-c', '--curr', type=str, default=None, help=f'Convert currency (overrides configuration file).')
     parser.add_argument('-d', '--detail', action='store_true', help=f'Detailed output includes information such as 19 {HuququLabels.mithqal} equivalent, remainder, dates & times of gold prices, etc.')
@@ -132,7 +132,7 @@ def arguments():
 
 
 """ 
-    huh: ḥuqúqu'lláh helper Copyright (C) 2024  Sama Rahimian
+    huh: huququ'llah helper Copyright (C) 2024  Sama Rahimian
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this

@@ -12,7 +12,8 @@ from pathlib import Path
 import ssl
 import logging
 
-# cfg_local imports
+# Local imports
+from huh.__init__ import __title__
 from huh.settings import arguments, Configuration
 from huh.huquq import Huququllah, HuququLabels, record
 from huh.metal import metal_price, MetalPrice
@@ -85,7 +86,7 @@ def run():
     
     # Full output
     if args.detail:
-        print(f"~~ HUH: {HuququLabels.diacritic_upper} Helper ~~\n")
+        print(f"~~ {__title__} ~~\n")
 
         if not args.price:
             print(f'Date & time for price search: {target_time}')

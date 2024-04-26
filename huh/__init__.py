@@ -7,13 +7,13 @@ __author__ = ['Sama Rahimian']
 __email__ = ['samajr.dev<at>gmail.com']
 __title__ = "huh: ḥuqúqu'lláh helper"
 __copyright__ = "Copyright (C) 2024"
-__version__ = '0.9.5'
+__version__ = '0.9.6'
 __status__ = 'development'
 __license__ = 'MPL-2.0'
 
 
 """ 
-    huh: ḥuqúqu'lláh helper Copyright (C) 2024  Sama Rahimian
+    huh: huququ'llah helper Copyright (C) 2024  Sama Rahimian
 
     This Source Code Form is subject to the terms of the Mozilla Public
     License, v. 2.0. If a copy of the MPL was not distributed with this

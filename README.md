@@ -1,8 +1,8 @@
 # huh: ḥuqúqu'lláh helper
 
-Calculate 19 mit͟hqáls of gold and 19% of wealth (*after* expenses); a ḥuqúqu'lláh helper.
+Calculate 19 mit͟hqáls of gold and 19% of wealth (*after* debts and expenses); a ḥuqúqu'lláh helper.
 
-Help calculate the _Ḥuqúqu'lláh_ (_Right of God_; Arabic: _Ḥuqúq_ 'right', _Alláh_ 'God'), a voluntary tax ([Wikipedia](https://en.wikipedia.org/wiki/Huq%C3%BAqu%27ll%C3%A1h); [Huqúqu'lláh Compilation](https://bahai-library.com/compilation_huququllah_right_god/)), by retrieving the price of gold and performing required operations. The program will output the gold price and any payable amount of ḥuqúqu'lláh.
+Helps calculate the voluntary tax _Ḥuqúqu'lláh_ (_Right of God_; Arabic: _Ḥuqúq_ 'right', _Alláh_ 'God'), paid by those who have *willingly chosen* to be Bahá'í ([Wikipedia](https://en.wikipedia.org/wiki/Huq%C3%BAqu%27ll%C3%A1h); [Huqúqu'lláh Compilation](https://bahai-library.com/compilation_huququllah_right_god/)). Will retrieve the price of gold and perform the required operations, then the program will output the gold price and the payable amount of Ḥuqúqu'lláh (if any).
 
 ## Setup
 
