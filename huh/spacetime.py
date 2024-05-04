@@ -141,11 +141,19 @@ def nearestTime(target: (datetime, int), data: list):
     return min(data, key=lambda x : abs(x.timestamp - target))
 
 
-def fixFiscalDate(d):
+def setAndFixFiscalDate(d):
+    if d.lower() == "today":
+        d = datetime.datetime.strptime(f'{datetime.datetime.today().month}-{datetime.datetime.today().day}', "%m-%d")
+    else:
+        d = datetime.datetime.strptime(d, "%m-%d")
+
+    # back to the future
     if d.year == 1900:
         d = d.replace(year=datetime.datetime.now().year)
 
     if d.date() > datetime.datetime.now().date():
+        # "No, I know; you did send me back to the future. But I'm back - I'm back from the future." -Marty
         d = d.replace(year=(datetime.datetime.now().year - 1))
     
     return d
+

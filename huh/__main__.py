@@ -38,15 +38,16 @@ def mp_wrapper(tt, usrPrice=None, curr=None):
 def run():
     try:
         args = arguments()
-        configFile = args.filename if Path(args.filename).exists() else "huh.ini"
+        print(args)
+        configFile = args.filename if args.filename else "./huh.ini"
         cfg = Configuration(configFile).conf
     except ValueError as e:
         print(e)
         sys.exit(-1)
     
     if not cfg:
-        dateTmp = datetime.strptime("04-20", "%m-%d")
-        dateTmp = st.fixFiscalDate(dateTmp)
+        # dateTmp = datetime.strptime(, "%m-%d")
+        dateTmp = st.setAndFixFiscalDate("04-20")
         timeTmp = st.getSolarTime(date=dateTmp)
         target_time = datetime.combine(dateTmp, timeTmp.time())
 
@@ -56,8 +57,7 @@ def run():
     else:
         # Determine time period for when gold prices should be gathered
         cfg_loc = cfg['LOCATION']
-        fiscalDate, fiscalTime =  datetime.strptime(cfg['FISCAL']['date'], "%m-%d"), cfg['FISCAL']['time']
-        fiscalDate = st.fixFiscalDate(fiscalDate)
+        fiscalDate, fiscalTime = st.setAndFixFiscalDate(cfg['FISCAL']['date']), cfg['FISCAL']['time']
 
         if (period:= fiscalTime.lower().rstrip()) in st.getSunPeriodTerms():
             address = f"{cfg_loc['city']} {cfg_loc['state']} {cfg_loc['country']}"      
