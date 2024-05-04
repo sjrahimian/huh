@@ -79,15 +79,15 @@ class Configuration():
                 sys.exit(1)
 
         val = cfg[section]['date']
-        if not re.fullmatch("[0-1][0-9]-[0-3][0-9]", val):
+        if not re.fullmatch("([0-1][0-9]-[0-3][0-9])|(today|TODAY)", val):
             raise IncorrectConfigValue(f'[{section}] > date value is invalid: "{val}"')
             sys.exit(1)
-
-        try:
-            datetime.strptime(val, "%m-%d")
-        except ValueError:
-            print(f'[{section}] > fiscal date value is not a valid "MM-DD" format: "{val}"')
-            sys.exit(1)
+        elif val.lower() != "today":
+            try:
+                datetime.strptime(val, "%m-%d")
+            except ValueError:
+                print(f'[{section}] > fiscal date value is not a valid "MM-DD" format: "{val}"')
+                sys.exit(1)
 
     # Logger setup for use throughout application
     def _prepareLogger(self, fn):
