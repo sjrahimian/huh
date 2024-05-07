@@ -61,10 +61,11 @@ class Huququllah:
     price: float = None
     weight: str = "toz"
 
-    def __init__(self, wealth=None, price=None, weight: str='toz'):
+    def __init__(self, wealth=None, price=None, weight: str='toz', currency: str="USD"):
         self.wealth = wealth
         self.price = price
         self.weight = weight
+        self.curr = currency
 
         # Calculate Huququllah
         self._basicSum()
@@ -159,7 +160,7 @@ class Huququllah:
         print(" ~ ~ ~ ")
         print(f"Basic: ${round(self.basic, 2):.2f} (equivalent to 19{HuququLabels.mithqal_unit} of gold)")
         print(f"Remainder of wealth: ${round(self.remainder, 2):.2f} ({HuququLabels.huquq_diacritic_lower} not paid)")
-        print(f"Payable: ${round(self.payable, 2):.2f}\n")
+        print(f"Payable: ${round(self.payable, 2):.2f} {self.curr}\n")
 
 
 def record(pkg, file=Path("huququllah_record.csv")):

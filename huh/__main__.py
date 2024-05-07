@@ -38,7 +38,6 @@ def mp_wrapper(tt, usrPrice=None, curr=None):
 def run():
     try:
         args = arguments()
-        print(args)
         configFile = args.filename if args.filename else "./huh.ini"
         cfg = Configuration(configFile).conf
     except ValueError as e:
@@ -78,7 +77,7 @@ def run():
         sys.exit(-1)
 
     # Calculate tax
-    huq = Huququllah(args.amount, m.price, m.weight)
+    huq = Huququllah(args.amount, m.price, m.weight, m.currency)
 
     if args.basic:
         huq.basic = args.basic
