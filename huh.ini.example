@@ -1,0 +1,28 @@
+#
+# huh: ḥuqúqu'lláh helper
+# Configuration file example
+#
+
+[LOCATION]
+# Address
+# Lat/Lon take precedence over address (default here is set to Bahjí)
+city = 
+state = 
+country = 
+latitude = 32.943608
+longitude = 35.091979
+
+[FISCAL]
+# Provide target date and time to search for metal prices.
+# Permits calculating huququ'llah on a different (historical) date.
+# Fiscal year end "MM-DD" date or "today" (date is ignored if next section is set to "now")
+date = 04-20
+# Options: dawn, sunrise, noon, sunset, dusk, now, "HH:MM" (24-hour)
+time = sunset
+
+[HUQUQ]
+currency = USD
+
+[RECORD]
+# Uncomment to record results into a file
+# file = huququllah_record.csv"
