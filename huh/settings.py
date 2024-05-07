@@ -123,10 +123,10 @@ def arguments():
     parser.add_argument('amount', type=float, help=f'Amount of wealth or capital (after debts and expenses) to have {HuququLabels.huquq.capitalize()} calculated on.')
     parser.add_argument('-b', '--basic', type=float, default=None, help=f'User can provide the basic unit equal to 19 {HuququLabels.mithqal}.')
     parser.add_argument('-c', '--curr', type=str, default=None, help=f'Convert currency (overrides configuration file).')
-    parser.add_argument('-d', '--detail', action='store_true', help=f'Detailed output includes information such as 19 {HuququLabels.mithqal} equivalent, remainder, dates & times of gold prices, etc.')
+    parser.add_argument('-d', '--detail', action='store_true', help=f'Detailed information printed such as 19 {HuququLabels.mithqal} equivalent, remainder, dates & times of gold prices, etc.')
     parser.add_argument('-f', '--filename', type=str, default=None, help=f'Provide path and filename to configuration file.')
     parser.add_argument('-o', '--output', type=str, default=None, help=f'Record data from run in a CSV file; provide path and filename.')
-    parser.add_argument('-p', '--price', type=str, action=MetalPriceAction, default=None, help="User can provide the gold price in this format and order: '[currency],[price],[weight]'.")
+    parser.add_argument('-p', '--price', type=str, action=MetalPriceAction, default=None, help="User can provide the gold price in this exact format: '[currency],[price],[weight]'.")
 
     return parser.parse_args()
 
