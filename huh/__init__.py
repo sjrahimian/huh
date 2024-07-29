@@ -7,7 +7,7 @@ __author__ = ['Sama Rahimian']
 __email__ = ['samajr.dev<at>gmail.com']
 __title__ = "huh: ḥuqúqu'lláh helper"
 __copyright__ = "Copyright (C) 2024"
-__version__ = '0.9.8'
+__version__ = '0.9.9'
 __status__ = 'development'
 __license__ = 'MPL-2.0'
 
