@@ -6,27 +6,28 @@ Helps calculate the voluntary tax _Ḥuqúqu'lláh_ (_Right of God_; Arabic: _�
 
 ## Setup
 
-### Running program
+### Run Program
 
-Planning to release executable file soon. Until then follow the instructions in [Development](#development) to get setup.
+Start program with `python -m huh` or `python app.py`.
+To see options by adding `-h/--help`.
 
-Use the `huh.ini` configuration file to change defaults (e.g., which date to fetch metal prices). An example configuration file is provided of what can be changed can be found in [`huh.ini.example`](./huh.ini.example); **remember** to rename the file to `huh.ini`. File needs to be in the same directory as the `app.py` file.
+Planning to release an executable file; until then follow the instructions in [Development](#development) to get setup.
 
-To see options execute `python app.py --help`.
+#### Configuration
+
+Use the `huh.ini` configuration file to change defaults (e.g., which date to fetch metal prices). An example configuration file is provided with what can be changed can be found in [`huh.ini.example`](./huh.ini.example); **remember** to rename the file to `huh.ini`. File needs to be in the same directory as the `app.py` file or use `-f` to provide the path.
 
 ### Development
 
-Clone/download repo, create a virtual environment, and install the necessary packages.
+Clone repo, create a virtual environment, and install the necessary packages.
 
 ```bash
 $ python -m venv venv
-$ . venv/bin/activate #(or .\venv\Scripts\Activate.ps1 )
-$ pip install astral geopy requests timezonefinder
-    # or
+$ . venv/bin/activate # or .\venv\Scripts\Activate.ps1
 $ pip install -r requirements.txt
 ```
 
-Python packages used:
+Packages:
 
 * astral
 * geopy
