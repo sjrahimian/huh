@@ -118,7 +118,11 @@ def arguments():
                 file, You can obtain one at http://mozilla.org/MPL/2.0/."""
 
     describe = f'Help calculate the voluntary tax {HuququLabels.huquq_diacritic_upper} ("Right of God") by retrieving the price of gold and performing required operations. The program will output the gold price and any payable amount of {HuququLabels.huquq_diacritic_upper}.'
-    parser = argparse.ArgumentParser(description=describe, epilog=lic)
+    
+    if "__main__" in sys.argv[0]:
+        parser = argparse.ArgumentParser(prog='python -m huh', description=describe, epilog=lic)
+    else:
+        parser = argparse.ArgumentParser(description=describe, epilog=lic)
 
     parser.add_argument('amount', type=float, help=f'Amount of wealth or capital (after debts and expenses) to have {HuququLabels.huquq.capitalize()} calculated on.')
     parser.add_argument('-b', '--basic', type=float, default=None, help=f'User can provide the basic unit equal to 19 {HuququLabels.mithqal}.')
