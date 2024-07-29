@@ -13,10 +13,10 @@ import ssl
 import logging
 
 # Local imports
-from huh.__init__ import __title__
-from huh.settings import arguments, Configuration
-from huh.huquq import Huququllah, HuququLabels, record
-from huh.metal import metal_price, MetalPrice
+from .__init__ import __title__
+from .settings import arguments, Configuration
+from .huquq import Huququllah, HuququLabels, record
+from .metal import metal_price, MetalPrice
 import huh.spacetime as st
 
 def floatFmt(*args):
@@ -35,7 +35,7 @@ def mp_wrapper(tt, usrPrice=None, curr=None):
 
 
 # Run
-def run():
+def main():
     try:
         args = arguments()
         configFile = args.filename if args.filename else "./huh.ini"
@@ -111,4 +111,8 @@ def run():
             if (f:= Path(args.output)).parent.is_dir():
                 record(pkg, f)
 
-                
+""" Launch app """
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
+

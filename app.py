@@ -3,12 +3,12 @@
 
 
 import sys
-from huh import __main__
+from huh.__main__ import main
 
 
 """ Launch app """
 if __name__ == '__main__':
-    __main__.run()
+    main()
     sys.exit(0)
 
 
