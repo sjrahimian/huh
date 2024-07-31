@@ -15,7 +15,9 @@ Planning to release an executable file; until then follow the instructions in [D
 
 #### Configuration
 
-Use the `huh.ini` configuration file to change defaults (e.g., which date to fetch metal prices). An example configuration file is provided with what can be changed can be found in [`huh.ini.example`](./huh.ini.example); **remember** to rename the file to `huh.ini`. File needs to be in the same directory as the `app.py` file or use `-f` to provide the path.
+Use the [`huh.ini`](./huh.ini) configuration file to change defaults (e.g., currency). File needs to be in the same directory as program or as the `app.py` file, or alternatively use `-f` to provide the `path/to/file.ini`.
+
+**Note:** Currently does not convert amount to the default currency if prices are not available.
 
 ### Development
 

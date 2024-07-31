@@ -5,6 +5,7 @@ notes*.txt
 *.conf
 *.csv
 .vscode/
+!huh.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -39,6 +40,7 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+!app.spec
 
 # Installer logs
 pip-log.txt
