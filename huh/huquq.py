@@ -89,7 +89,7 @@ class Huququllah:
                  19Nk =  1Mq =  3.642g
                 361Nk = 19Mq = 69.192g
 
-            Calculation:
+            To get the equivalent value:
                 19 mq = $gold/g * 69.192g
                            or
                 19 mq = $gold/g * (3.642g * 19mq)
@@ -109,8 +109,6 @@ class Huququllah:
             factor = self._TROYOZ
         elif self.weight in ("gram", "grams", "g"):
             factor = self._GRAMS
-        elif self.weight in ("mithqal", "mithqals", "mq"):
-            factor = self._MITHQAL
         else:
             raise ValueError(f"Unrecognized weight provided: {self.weight}")
             sys.exit(1)
