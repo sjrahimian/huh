@@ -76,6 +76,9 @@ def main():
         print("Unable to obtain gold price. Bye.")
         sys.exit(-1)
 
+    # Check if metal curr matches amount currency (default currency in config) and if not convert
+
+
     # Calculate tax
     huq = Huququllah(args.amount, m.price, m.weight, m.currency)
 
@@ -93,10 +96,10 @@ def main():
             print(f'Date & time for gold price: {st.epochToDatetime(m.timestamp)}')
             print(" ~ ~ ~ ")
 
-        print(f"Gold price ({m.source}): {m}")
+        print(f"Gold price (from {m.source}): {m}")
         huq.report()
     else:
-        print(f"Gold price ({m.source}): {m}")
+        print(f"Gold price (from {m.source}): {m}")
         print(f"   Payable: {str(huq)} {m.currency}")
 
     # Create record
