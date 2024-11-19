@@ -38,6 +38,14 @@ Packages:
 
 Thank you to the respective module Authors.
 
+## Output
+
+In addtion to the output in terminal there is an option to store the data in CSV format if a filename is provided (`-o/--output [FILENAME]` or uncomment file under the RECORD in the config file.)
+
+The CSV format is as follows:
+`recorded date, gold price retrieved date, gold price, weight, currency, price source, wealth, payable`
+
+
 ## License
 
 ### [MPL-2.0](./LICENSE)

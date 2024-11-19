@@ -50,8 +50,8 @@ def main():
         timeTmp = st.getSolarTime(date=dateTmp)
         target_time = datetime.combine(dateTmp, timeTmp.time())
 
-        c = args.curr.upper() if args.curr else None
-        m = mp_wrapper(target_time, args.price, c)
+        target_curr = args.curr.upper() if args.curr else None
+        m = mp_wrapper(target_time, args.price, target_curr)
 
     else:
         # Determine time period for when gold prices should be gathered
@@ -68,16 +68,17 @@ def main():
             target_time = datetime.combine(fiscalDate, datetime.strptime(fiscalTime, "%H:%M").time())
 
         # Fetch the price of gold
-        tmpCurr = cfg['HUQUQ']['currency'].upper() if 'currency' in cfg['HUQUQ'] else None
-        c = args.curr.upper() if args.curr else tmpCurr
-        m = mp_wrapper(target_time, args.price, c)
+        tmpCurr = cfg['HUQUQ']['currency'].upper() if 'currency' in cfg['HUQUQ'] else "USD"
+        target_curr = args.curr.upper() if args.curr else tmpCurr
+        m = mp_wrapper(target_time, args.price, target_curr)
 
     if not m:
         print("Unable to obtain gold price. Bye.")
         sys.exit(-1)
 
     # Check if metal curr matches amount currency (default currency in config) and if not convert
-
+    # if m.currency != target_curr:
+    # m.price, m.currency = convert_price(m.price, m.currency, target_curr)
 
     # Calculate tax
     huq = Huququllah(args.amount, m.price, m.weight, m.currency)
@@ -103,7 +104,7 @@ def main():
         print(f"   Payable: {str(huq)} {m.currency}")
 
     # Create record
-    headers = ["created entry", "search target", "gold price retrieved", "gold price", "weight", "currency", "wealth", "payable"]
+    headers = ["recorded date", "gold price retrieved date", "gold price", "weight", "currency", "price source", "wealth", "payable"]
     pkg = [datetime.now(), target_time, m.timestamp] + floatFmt(m.price)+ [m.weight, m.currency, m.source] + floatFmt(huq.wealth, huq.payable)
     if cfg:
         if 'file' in cfg['RECORD']:
